@@ -38,6 +38,6 @@ jobs:
     - name: Run build
       working-directory: src
       run: |
-        echo "${{ toJson(github.event.pull_request.labels) }}"
+        echo "${{ toJson(github.event) }}"
         yarn install
         yarn build
