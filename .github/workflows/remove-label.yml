@@ -6,7 +6,7 @@ name: GIPO FE build
 on:
   # Triggers the workflow on push on all branches ignoring main or develop
   pull_request:
-    types: [unlabeled]
+    types: [labeled, unlabeled]
     # Trigger the workflow only if anything changes inside the Gipo FE folders
     paths:
       - 'src/hello/'
