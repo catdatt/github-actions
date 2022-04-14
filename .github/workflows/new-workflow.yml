@@ -44,11 +44,28 @@ jobs:
         if [-z "$(git status --porcelain)"]; then
           echo "::set-output name=push::false"
         else
-          git commit -a -m'[bot] Copied Gipo build files into wwwroot folder' --allow-empty
+          git diff-index --quiet HEAD || (git commit -a -m'[bot] Copied Gipo build files into wwwroot folder' --allow-empty)
           echo "::set-output name=push::true"
         fi
       shell: bash
 
+    # - name: Commit changes
+    #   id: commit
+    #   run: |
+    #     git config --local user.email "action@github.com"
+    #     git config --local user.name "github-actions"
+    #     git add --all
+    #     if [-z "$(git status --porcelain)"]; then
+    #       echo "::set-output name=push::false"
+    #     else
+    #       git commit -a -m'[bot] Copied Gipo build files into wwwroot folder' --allow-empty
+    #       echo "::set-output name=push::true"
+    #     fi
+    #   shell: bash
+
     - name: Push changes
-      run: |
-        git push
+      if: steps.commit.outputs.push == 'true'
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: ${{ github.ref }}
