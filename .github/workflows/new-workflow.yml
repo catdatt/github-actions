@@ -32,7 +32,7 @@ jobs:
 
     - name: Move build to BE folder
       run: |
-        rm -rfv public/wwwroot && mkdir public && cd public && mdkir wwwroot
+        rm -rfv public/wwwroot && mkdir -p public/wwwroot
         cp -a src/hello/. public/wwwroot/
 
     - name: Commit changes
@@ -50,8 +50,5 @@ jobs:
       shell: bash
 
     - name: Push changes
-      if: steps.commit.outputs.push == 'true'
-      uses: ad-m/github-push-action@master
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        branch: ${{ github.ref }}
+      run: |
+        git push
