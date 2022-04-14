@@ -1,0 +1,58 @@
+# This is a basic workflow to help you get started with Actions
+
+name: GIPO FE build
+
+# Controls when the action will run. 
+on:
+  # Triggers the workflow on push when 'gipo-skip-build' label is removed from pull_requested 
+  pull_request:
+    types: [labeled, unlabeled, opened, synchronize, reopened]
+    paths:
+      - 'src/Vendors/Gipo/FrontPlugins/src/**'
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    if: contains(github.event.pull_request.labels.*.name, 'gipo-skip-build') == false
+    name: Build project
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: actions/checkout@v2
+    - name: Run build
+      working-directory: src/hello
+      run: |
+        yarn install
+        yarn build
+
+    - name: Move build to BE folder
+      run: |
+        rm -rfv public/wwwroot && mkdir public/wwwroot
+        cp -a src/hello/. public/wwwroot/
+
+    - name: Commit changes
+      id: commit
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "github-actions"
+        git add --all
+        if [-z "$(git status --porcelain)"]; then
+          echo "::set-output name=push::false"
+        else
+          git commit -a -m'[bot] Copied Gipo build files into wwwroot folder' --allow-empty
+          echo "::set-output name=push::true"
+        fi
+      shell: bash
+
+    - name: Push changes
+      if: steps.commit.outputs.push == 'true'
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: ${{ github.ref }}
