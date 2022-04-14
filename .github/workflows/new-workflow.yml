@@ -29,7 +29,6 @@ jobs:
       working-directory: src/hello
       run: |
         yarn install
-        yarn build
 
     - name: Move build to BE folder
       run: |
