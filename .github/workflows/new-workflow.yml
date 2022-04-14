@@ -32,7 +32,7 @@ jobs:
 
     - name: Move build to BE folder
       run: |
-        rm -rfv public/wwwroot && mkdir public/wwwroot
+        rm -rfv public/wwwroot && mkdir public && cd public && mdkir wwwroot
         cp -a src/hello/. public/wwwroot/
 
     - name: Commit changes
